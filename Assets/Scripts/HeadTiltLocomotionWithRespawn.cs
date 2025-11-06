@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit; // for XRBaseController haptics
 
@@ -78,7 +78,7 @@ public class HeadTiltLocomotionWithRespawn : MonoBehaviour
         float rollFromNeutral = rawRoll - _neutralRollDeg;
 
         if (printRollInConsole)
-            Debug.Log($"[Tilt] raw:{rawRoll:F1}°, neutral:{_neutralRollDeg:F1}°, fromNeutral:{rollFromNeutral:F1}°");
+            Debug.Log($"[Tilt] raw:{rawRoll:F1}Â°, neutral:{_neutralRollDeg:F1}Â°, fromNeutral:{rollFromNeutral:F1}Â°");
 
         // 2) Map to strafe input
         float strafeInput = RollToInput(rollFromNeutral, deadZoneDegrees, maxTiltDegrees);
@@ -127,7 +127,7 @@ public class HeadTiltLocomotionWithRespawn : MonoBehaviour
         if (!head) return;
         _neutralRollDeg = GetGravityRelativeRollDegrees(head);
         if (printRollInConsole)
-            Debug.Log($"[Tilt] Calibrated neutral = {_neutralRollDeg:F1}°");
+            Debug.Log($"[Tilt] Calibrated neutral = {_neutralRollDeg:F1}Â°");
     }
 
     // ---------------- HAPTICS ----------------

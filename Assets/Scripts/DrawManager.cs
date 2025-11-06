@@ -9,7 +9,6 @@ public class DrawManager : MonoBehaviour
     public float minDistance = 0.01f;
 
     public AudioSource drawSound; // assign your AudioSource with the MP3
-    public HapticImpulsePlayer hapticPlayer;
 
     private LineRenderer currentLine;
     private Vector3 lastPoint;
@@ -27,17 +26,10 @@ public class DrawManager : MonoBehaviour
 
                 if (drawSound != null && !drawSound.isPlaying)
                     drawSound.Play();
-
-                if (hapticPlayer != null)
-                    hapticPlayer.SendHapticImpulse(0.5f, 0.1f);  // amplitude, duration
             }
             else
             {
                 AddPointIfNeeded();
-
-                // optionally send repeated small haptics as you draw
-                if (hapticPlayer != null)
-                    hapticPlayer.SendHapticImpulse(0.2f, 0.05f);
             }
         }
         else

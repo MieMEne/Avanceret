@@ -18,6 +18,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Soffelade.unity
     guid: c007b4689b3154b34b604cd2c45172c0
   m_configObjects:
+    Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 07b4eaed70ce5994daba0fbfb114cead, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 77e65a97841ab415892199ceb2317198, type: 2}
     com.unity.xr.openxr.settings4: {fileID: 11400000, guid: e7aa362efbeed43d78245c60be205459, type: 2}

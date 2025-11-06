@@ -5,15 +5,15 @@ public class VoiceProximityTorch : MonoBehaviour
 {
     [Header("Refs")]
     public Light torchLight;
-    public ParticleSystem flameFX;           // optional (if your flame is particles)
-    public Renderer flameRenderer;           // optional (if your flame is a mesh with emission)
+    public ParticleSystem flameFX;
+    public Renderer flameRenderer;
 
     [Header("Proximity")]
     public string playerTag = "Player";
-    public float triggerStayFade = 0.2f;     // fade out delay when you leave zone
+    public float triggerStayFade = 0.2f;
 
     [Header("Mic")]
-    public string microphoneDevice = "";     // leave empty = default mic
+    public string microphoneDevice = "";
     [Range(8000, 48000)] public int sampleRate = 24000;
     public int micBufferSeconds = 10;
 
@@ -32,7 +32,11 @@ public class VoiceProximityTorch : MonoBehaviour
     [ColorUsage(true, true)] public Color emissionColor = new Color(1f, 0.5f, 0.1f);
     public float emissionBoost = 2.5f;
 
-    // runtime
+    [Header("Debug / Visuals")]
+    public bool showDebug = true;
+    [Range(0f, 1f)] public float currentRMS;   // for live display in inspector
+    public float debugBarHeight = 0.05f;       // on-screen visual height
+
     private bool inZone = false;
     private float currentIntensity = 0f;
     private AudioClip micClip;
@@ -46,9 +50,15 @@ public class VoiceProximityTorch : MonoBehaviour
         ToggleParticles(false);
         SetEmission(0f);
 
-        // start mic
-        if (Microphone.devices.Length == 0) { Debug.LogWarning($"{name}: no mic found"); return; }
+        if (Microphone.devices.Length == 0)
+        {
+            Debug.LogWarning($"{name}: No microphone found");
+            return;
+        }
+
         string dev = string.IsNullOrEmpty(microphoneDevice) ? Microphone.devices[0] : microphoneDevice;
+        Debug.Log($"{name}: Using mic '{dev}'");
+
         micClip = Microphone.Start(dev, true, micBufferSeconds, sampleRate);
         StartCoroutine(WaitForMicReady(dev));
     }
@@ -56,38 +66,63 @@ public class VoiceProximityTorch : MonoBehaviour
     System.Collections.IEnumerator WaitForMicReady(string dev)
     {
         int pos = 0;
-        while (Microphone.IsRecording(dev) && pos <= 0) { pos = Microphone.GetPosition(dev); yield return null; }
+        while (Microphone.IsRecording(dev) && pos <= 0)
+        {
+            pos = Microphone.GetPosition(dev);
+            yield return null;
+        }
         micReady = true;
+        Debug.Log($"{name}: Microphone ready and recording.");
     }
 
-    void OnDestroy() { StopMic(); }
-    void OnDisable() { StopMic(); }
+    void OnDestroy() => StopMic();
+    void OnDisable() => StopMic();
+
     void StopMic()
     {
         if (Microphone.devices.Length > 0) Microphone.End(null);
         if (micClip) Destroy(micClip);
-        micClip = null; micReady = false;
+        micClip = null;
+        micReady = false;
     }
 
     void Update()
     {
-        bool active = inZone; // only react in zone
-        if (!active || !micReady || micClip == null) { Smooth(false); return; }
+        bool active = inZone;
+        if (!active || !micReady || micClip == null)
+        {
+            Smooth(false);
+            return;
+        }
 
         const int window = 1024;
         int pos = Microphone.GetPosition(null);
-        if (pos < window) { Smooth(false); return; }
-        int start = pos - window; if (start < 0) start += micClip.samples;
+        if (pos < window)
+        {
+            Smooth(false);
+            return;
+        }
+
+        int start = pos - window;
+        if (start < 0) start += micClip.samples;
         if (temp.Length != window) temp = new float[window];
         micClip.GetData(temp, start);
 
         double sum = 0;
-        for (int i = 0; i < window; i++) { float s = temp[i]; sum += s * s; }
-        float rms = Mathf.Sqrt((float)(sum / window));
+        for (int i = 0; i < window; i++)
+        {
+            float s = temp[i];
+            sum += s * s;
+        }
+
+        currentRMS = Mathf.Sqrt((float)(sum / window));
+
+        if (showDebug)
+            Debug.Log($"{name}: RMS = {currentRMS:F4} (threshold {voiceOnThreshold})");
 
         float t = Time.time;
-        bool aboveOn = rms >= voiceOnThreshold;
-        bool aboveOff = rms >= voiceOffThreshold;
+        bool aboveOn = currentRMS >= voiceOnThreshold;
+        bool aboveOff = currentRMS >= voiceOffThreshold;
 
         if (aboveOn)
         {
@@ -105,8 +140,9 @@ public class VoiceProximityTorch : MonoBehaviour
     void Smooth(bool on)
     {
         float target = on ? maxIntensity : 0f;
-        float speed = on ? (maxIntensity / Mathf.Max(0.0001f, fadeInSeconds))
-                          : (maxIntensity / Mathf.Max(0.0001f, fadeOutSeconds));
+        float speed = on
+            ? (maxIntensity / Mathf.Max(0.0001f, fadeInSeconds))
+            : (maxIntensity / Mathf.Max(0.0001f, fadeOutSeconds));
 
         currentIntensity = Mathf.MoveTowards(currentIntensity, target, speed * Time.deltaTime);
 
@@ -140,10 +176,36 @@ public class VoiceProximityTorch : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag(playerTag)) inZone = true;
+        if (other.CompareTag(playerTag))
+        {
+            inZone = true;
+            if (showDebug) Debug.Log($"{name}: Player entered trigger zone.");
+        }
     }
+
     void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag(playerTag)) inZone = false;
+        if (other.CompareTag(playerTag))
+        {
+            inZone = false;
+            if (showDebug) Debug.Log($"{name}: Player left trigger zone.");
+        }
     }
+
+    void OnGUI()
+    {
+        if (!showDebug || !Application.isPlaying) return;
+        if (!micReady) return;          // no mic yet
+                                        // If you only want the bar while near the torch, uncomment:
+                                        // if (!inZone) return;
+
+        float height = debugBarHeight * Screen.height;                    // pixels
+        float width = Mathf.Clamp01(currentRMS / Mathf.Max(0.0001f, voiceOnThreshold)) * 200f;
+
+        GUI.color = Color.Lerp(Color.green, Color.red, Mathf.Clamp01(currentRMS / voiceOnThreshold));
+        GUI.Box(new Rect(20, 20, width, height), "RMS");                  // ✅ 4 args
+        GUI.color = Color.white;
+        GUI.Label(new Rect(20, 25 + height, 260, 24), $"RMS: {currentRMS:F4}");
+    }
+
 }

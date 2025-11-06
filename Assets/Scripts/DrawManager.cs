@@ -1,71 +1,73 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.XR.Interaction.Toolkit.Inputs.Haptics;
 
 public class DrawManager : MonoBehaviour
 {
     public LineRenderer linePrefab;       // assign a prefab with a LineRenderer
     public InputActionReference drawAction; // link to your trigger input
     public float minDistance = 0.01f;
-    public LayerMask drawingSurfaceMask; // assign layer for the canvas
+
+    public AudioSource drawSound; // assign your AudioSource with the MP3
+    public HapticImpulsePlayer hapticPlayer;
 
     private LineRenderer currentLine;
     private Vector3 lastPoint;
-    private bool isDrawing;
+    private bool isDrawing = false;
 
     void Update()
     {
-        bool triggerPressed = drawAction.action.ReadValue<float>() > 0.1f;
-
-        if (triggerPressed)
+        float triggerValue = drawAction.action.ReadValue<float>();
+        if (triggerValue > 0.1f)
         {
-            RaycastHit hit;
-
-            // Raycast from the brush tip forward
-            if (Physics.Raycast(transform.position, transform.forward, out hit, 0.1f, drawingSurfaceMask))
+            if (!isDrawing)
             {
-                Vector3 drawPosition = hit.point;
+                StartNewLine();
+                isDrawing = true;
 
-                transform.rotation = Quaternion.LookRotation(-hit.normal);
+                if (drawSound != null && !drawSound.isPlaying)
+                    drawSound.Play();
 
-                if (!isDrawing)
-                {
-                    StartNewLine(drawPosition);
-                    isDrawing = true;
-                }
-                else
-                {
-                    AddPointIfNeeded(drawPosition);
-                }
+                if (hapticPlayer != null)
+                    hapticPlayer.SendHapticImpulse(0.5f, 0.1f);  // amplitude, duration
             }
             else
             {
-                // not touching canvas
-                isDrawing = false;
-                currentLine = null;
+                AddPointIfNeeded();
+
+                // optionally send repeated small haptics as you draw
+                if (hapticPlayer != null)
+                    hapticPlayer.SendHapticImpulse(0.2f, 0.05f);
             }
         }
         else
         {
-            isDrawing = false;
-            currentLine = null;
+            if (isDrawing)
+            {
+                currentLine = null;
+                isDrawing = false;
+
+                if (drawSound != null && drawSound.isPlaying)
+                    drawSound.Stop();
+            }
         }
     }
 
-    void StartNewLine(Vector3 startPos)
+    void StartNewLine()
     {
         currentLine = Instantiate(linePrefab);
         currentLine.positionCount = 1;
-        currentLine.SetPosition(0, startPos);
-        lastPoint = startPos;
+        currentLine.SetPosition(0, transform.position);
+        lastPoint = transform.position;
     }
 
-    void AddPointIfNeeded(Vector3 newPos)
+    void AddPointIfNeeded()
     {
-        if (Vector3.Distance(lastPoint, newPos) > minDistance)
+        if (Vector3.Distance(lastPoint, transform.position) > minDistance)
         {
             currentLine.positionCount++;
-            currentLine.SetPosition(currentLine.positionCount - 1, newPos);
-            lastPoint = newPos;
+            currentLine.SetPosition(currentLine.positionCount - 1, transform.position);
+            lastPoint = transform.position;
         }
     }
 }

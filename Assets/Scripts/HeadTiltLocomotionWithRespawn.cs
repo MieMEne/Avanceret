@@ -35,6 +35,10 @@ public class HeadTiltLocomotionWithRespawn : MonoBehaviour
     public XRBaseController leftController;
     public XRBaseController rightController;
 
+    [Header("Sound On Hit")] // <-- ADDED
+    [Tooltip("Assign an AudioSource with your 'error' clip (Play On Awake OFF).")]
+    public AudioSource hitAudio; // <-- ADDED
+
     [Header("Debug")]
     public bool printRollInConsole = false;
 
@@ -105,9 +109,13 @@ public class HeadTiltLocomotionWithRespawn : MonoBehaviour
 
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        if (hit.collider != null && hit.collider.CompareTag("Obstacle"))
+        if (hit.collider != null && (hit.collider.CompareTag("Obstacle") || hit.collider.CompareTag("MovingObstacle"))) // <-- extended
         {
             TriggerHaptics();
+
+            // 🔊 play error sound (if assigned)  <-- ADDED
+            if (hitAudio) hitAudio.Play();
+
             Respawn();
         }
     }

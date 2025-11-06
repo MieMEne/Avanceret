@@ -11,9 +11,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/HeadTiltScene.unity
     guid: 16843553f525ec34986cb7b305e06695
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/IVsScene.unity
     guid: 6a0cd4030e22d4913a11a0ddc7ddcd93
+  - enabled: 1
+    path: Assets/Scenes/Soffelade.unity
+    guid: c007b4689b3154b34b604cd2c45172c0
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 77e65a97841ab415892199ceb2317198, type: 2}

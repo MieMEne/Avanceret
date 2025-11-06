@@ -63,4 +63,5 @@ public class DrawManager : MonoBehaviour
             lastPoint = transform.position;
         }
     }
+    
 }

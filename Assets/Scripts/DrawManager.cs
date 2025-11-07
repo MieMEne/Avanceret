@@ -1,18 +1,34 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.XR.Interaction.Toolkit.Inputs.Haptics;
+using Oculus.Haptics;
 
 public class DrawManager : MonoBehaviour
 {
-    public LineRenderer linePrefab;       // assign a prefab with a LineRenderer
-    public InputActionReference drawAction; // link to your trigger input
+    [Header("Drawing")]
+    public LineRenderer linePrefab;
+    public InputActionReference drawAction;
     public float minDistance = 0.01f;
+    public AudioSource drawSound;
 
-    public AudioSource drawSound; // assign your AudioSource with the MP3
+    [Header("Haptics (Oculus)")]
+    public HapticClip drawHapticClip; // assign a .haptic file from Oculus/Haptics/
+    public float amplitude = 1.0f;
+    public bool loopHaptics = true;
+    public bool useRightHand = true;
 
     private LineRenderer currentLine;
     private Vector3 lastPoint;
     private bool isDrawing = false;
+
+    private HapticClipPlayer hapticPlayer;
+     
+     void Awake()
+    {
+        if (drawHapticClip != null)
+        {
+            hapticPlayer = new HapticClipPlayer(drawHapticClip);
+        }
+    }
 
     void Update()
     {
@@ -26,6 +42,17 @@ public class DrawManager : MonoBehaviour
 
                 if (drawSound != null && !drawSound.isPlaying)
                     drawSound.Play();
+
+                if (hapticPlayer != null)
+                {
+                    hapticPlayer.amplitude = amplitude;
+
+                    // Choose which controller (Right or Left)
+                    var controller = useRightHand ? Controller.Right : Controller.Left;
+
+                    // Start playing the clip
+                    hapticPlayer.Play(controller);
+                }
             }
             else
             {
@@ -41,6 +68,11 @@ public class DrawManager : MonoBehaviour
 
                 if (drawSound != null && drawSound.isPlaying)
                     drawSound.Stop();
+
+                if (hapticPlayer != null)
+                {
+                    hapticPlayer.Stop();
+                }
             }
         }
     }

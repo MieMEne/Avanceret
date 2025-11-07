@@ -557,6 +557,10 @@ MonoBehaviour:
   drawAction: {fileID: 7904272356298805229, guid: c348712bda248c246b8c49b3db54643f, type: 3}
   minDistance: 0.1
   drawSound: {fileID: 441178222}
+  drawHapticClip: {fileID: 2460798210113038985, guid: 246a13ddaad2c41b695ee7770302bb49, type: 3}
+  amplitude: 1
+  loopHaptics: 1
+  useRightHand: 1
 --- !u!82 &441178222
 AudioSource:
   m_ObjectHideFlags: 0

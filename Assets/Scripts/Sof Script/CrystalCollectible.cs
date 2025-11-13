@@ -1,6 +1,8 @@
 using UnityEngine;
+using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
+using Oculus.Haptics;
 
 [RequireComponent(typeof(XRGrabInteractable))]
 public class CrystalCollectible : MonoBehaviour
@@ -24,8 +26,27 @@ public class CrystalCollectible : MonoBehaviour
     public ParticleSystem goodVFX;
     public ParticleSystem badVFX;
 
+    [Header("Haptics")]
+    [Tooltip("If true and a Meta .haptic clip is assigned, uses Meta Haptics SDK.")]
+    public bool useMetaHaptics = true;
+
+    [Tooltip("Haptic pattern for good crystals (.haptic file from Meta Haptic Studio).")]
+    public HapticClip goodHaptic;
+
+    [Tooltip("Haptic pattern for bad crystals (.haptic file from Meta Haptic Studio).")]
+    public HapticClip badHaptic;
+
+    [Tooltip("Optional: Assign XR controller references (can still work without).")]
+    public XRBaseController leftController;
+    public XRBaseController rightController;
+
+    [Range(0f, 1f)] public float hapticAmplitude = 0.7f;
+    public float hapticDuration = 0.1f;
+
     private XRGrabInteractable grab;
     private bool collected = false;
+
+    private HapticClipPlayer _hapticPlayer;
 
     private void Awake()
     {
@@ -37,24 +58,27 @@ public class CrystalCollectible : MonoBehaviour
     {
         if (grab != null)
             grab.selectEntered.RemoveListener(OnGrabbed);
+
+        if (_hapticPlayer != null)
+        {
+            _hapticPlayer.Dispose();
+            _hapticPlayer = null;
+        }
     }
 
     private void OnGrabbed(SelectEnterEventArgs args)
     {
-        // Prevent double collection
         if (collected) return;
         collected = true;
 
-        // Decide if this instance is "wrong"
+        // Determine if crystal is wrong
         bool wrong;
         if (detectWrongByTag)
             wrong = CompareTag(wrongTag);
         else
-            wrong = isWrongCrystal; // manual checkbox (or ignore both and just set value negative)
+            wrong = isWrongCrystal;
 
-        // Compute delta:
-        // - If you want to control purely by 'value', just set value = 1 or -1 and leave detectWrongByTag=false, isWrongCrystal=false.
-        // - If using tag/checkbox, we force sign based on that and use |value| as magnitude.
+        // Calculate score delta
         int delta;
         if (detectWrongByTag || isWrongCrystal)
         {
@@ -63,20 +87,19 @@ public class CrystalCollectible : MonoBehaviour
         }
         else
         {
-            delta = value; // simplest mode: value determines add/subtract
+            delta = value;
         }
 
-        // Add the value to the collector
+        // Add to collector
         if (CrystalCollector.Instance != null)
-        {
             CrystalCollector.Instance.Add(delta);
-        }
         else
-        {
             Debug.LogWarning("No CrystalCollector found in the scene!");
-        }
 
-        // Feedback
+        // ✅ Play haptic feedback (based on correct/wrong)
+        TriggerHaptics(args, wrong);
+
+        // Sound + VFX feedback
         if (wrong)
         {
             if (badSound) AudioSource.PlayClipAtPoint(badSound, transform.position);
@@ -88,7 +111,67 @@ public class CrystalCollectible : MonoBehaviour
             if (goodVFX) Instantiate(goodVFX, transform.position, Quaternion.identity);
         }
 
-        // Remove crystal from world
-        Destroy(gameObject);
+        Destroy(gameObject, 0.1f); // small delay to let haptic play
+    }
+
+    // ---------------- HAPTICS ----------------
+    private void TriggerHaptics(SelectEnterEventArgs args, bool wrong)
+    {
+        HapticClip clipToPlay = wrong ? badHaptic : goodHaptic;
+
+        // 1️⃣ Try Meta Haptics first
+        if (useMetaHaptics && clipToPlay != null)
+        {
+            if (_hapticPlayer != null)
+            {
+                _hapticPlayer.Dispose();
+                _hapticPlayer = null;
+            }
+
+            _hapticPlayer = new HapticClipPlayer(clipToPlay);
+
+            // Detect which hand grabbed it
+            var interactor = args.interactorObject as UnityEngine.XR.Interaction.Toolkit.Interactors.XRBaseInputInteractor;
+            if (interactor != null && interactor.xrController != null)
+            {
+                string name = interactor.xrController.name.ToLower();
+                if (name.Contains("left"))
+                    _hapticPlayer.Play(Controller.Left);
+                else if (name.Contains("right"))
+                    _hapticPlayer.Play(Controller.Right);
+                else
+                {
+                    _hapticPlayer.Play(Controller.Left);
+                    _hapticPlayer.Play(Controller.Right);
+                }
+            }
+            else
+            {
+                // If no controller found, play on both
+                _hapticPlayer.Play(Controller.Left);
+                _hapticPlayer.Play(Controller.Right);
+            }
+
+            return;
+        }
+
+        // 2️⃣ Fallback: XR haptics
+        if (leftController)
+            leftController.SendHapticImpulse(hapticAmplitude, hapticDuration);
+        if (rightController)
+            rightController.SendHapticImpulse(hapticAmplitude, hapticDuration);
+
+        // 3️⃣ Fallback low-level XR
+        TryLowLevelHaptic(XRNode.LeftHand, hapticAmplitude, hapticDuration);
+        TryLowLevelHaptic(XRNode.RightHand, hapticAmplitude, hapticDuration);
+    }
+
+    private static void TryLowLevelHaptic(XRNode node, float amplitude, float duration)
+    {
+        var device = InputDevices.GetDeviceAtXRNode(node);
+        if (!device.isValid) return;
+
+        if (device.TryGetHapticCapabilities(out HapticCapabilities caps) && caps.supportsImpulse)
+            device.SendHapticImpulse(0u, amplitude, duration);
     }
 }

@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Obstacle
   - MovingObstacle
+  - WrongCrystal
   layers:
   - Default
   - TransparentFX

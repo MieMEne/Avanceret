@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit; // for XRBaseController haptics
+using Oculus.Haptics;                     // Meta Haptics SDK
 
 [RequireComponent(typeof(CharacterController))]
 public class HeadTiltLocomotionWithRespawn : MonoBehaviour
@@ -25,7 +26,7 @@ public class HeadTiltLocomotionWithRespawn : MonoBehaviour
     [Tooltip("Optional: set a custom spawn transform. If empty, we use the scene start pose.")]
     public Transform customSpawnPoint;
 
-    [Header("Haptics On Hit")]
+    [Header("Haptics On Hit (legacy XR)")]
     public bool hapticsOnHit = true;
     [Range(0f, 1f)] public float hapticAmplitude = 0.6f;
     public float hapticDuration = 0.12f;
@@ -35,9 +36,20 @@ public class HeadTiltLocomotionWithRespawn : MonoBehaviour
     public XRBaseController leftController;
     public XRBaseController rightController;
 
-    [Header("Sound On Hit")] // <-- ADDED
+    [Header("Sound On Hit")]
     [Tooltip("Assign an AudioSource with your 'error' clip (Play On Awake OFF).")]
-    public AudioSource hitAudio; // <-- ADDED
+    public AudioSource hitAudio;
+
+    // Meta Haptics (.haptic file support)
+    [Header("Meta Haptics (.haptic)")]
+    [Tooltip("If assigned, this .haptic clip will be played on hit (Meta Haptics SDK).")]
+    public HapticClip obstacleHitClip;          // drag & drop error-126627.haptic here
+    [Tooltip("If enabled and a clip is assigned, use Meta Haptics instead of legacy XR haptics.")]
+    public bool useMetaHaptics = true;
+
+    [Range(0f, 1f)]
+    [Tooltip("Scales the strength of the .haptic clip (0 = off, 1 = full).")]
+    public float metaHapticsIntensity = 1f;
 
     [Header("Debug")]
     public bool printRollInConsole = false;
@@ -48,6 +60,9 @@ public class HeadTiltLocomotionWithRespawn : MonoBehaviour
     Vector3 _startPos;
     Quaternion _startRot;
     float _nextHapticTime = 0f;
+
+    // Meta Haptics runtime player
+    HapticClipPlayer _hitClipPlayer;
 
     void Awake()
     {
@@ -71,6 +86,16 @@ public class HeadTiltLocomotionWithRespawn : MonoBehaviour
         _startRot = customSpawnPoint ? customSpawnPoint.rotation : transform.rotation;
 
         CalibrateNeutralTilt();
+    }
+
+    void OnDestroy()
+    {
+        // clean up Meta Haptics player
+        if (_hitClipPlayer != null)
+        {
+            _hitClipPlayer.Dispose();
+            _hitClipPlayer = null;
+        }
     }
 
     void Update()
@@ -109,13 +134,10 @@ public class HeadTiltLocomotionWithRespawn : MonoBehaviour
 
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        if (hit.collider != null && (hit.collider.CompareTag("Obstacle") || hit.collider.CompareTag("MovingObstacle"))) // <-- extended
+        if (hit.collider != null && (hit.collider.CompareTag("Obstacle") || hit.collider.CompareTag("MovingObstacle")))
         {
-            TriggerHaptics();
-
-            // 🔊 play error sound (if assigned)  <-- ADDED
-            if (hitAudio) hitAudio.Play();
-
+            TriggerHaptics();          // now uses Meta Haptics if set
+            if (hitAudio) hitAudio.Play();   // play error sound
             Respawn();
         }
     }
@@ -142,6 +164,28 @@ public class HeadTiltLocomotionWithRespawn : MonoBehaviour
 
     void TriggerHaptics()
     {
+        // 1) Try Meta Haptics (.haptic) first
+        if (useMetaHaptics && obstacleHitClip != null)
+        {
+            // Always recreate the player to avoid clip getter issues
+            if (_hitClipPlayer != null)
+            {
+                _hitClipPlayer.Dispose();
+                _hitClipPlayer = null;
+            }
+
+            _hitClipPlayer = new HapticClipPlayer(obstacleHitClip);
+
+            // Intensity: amplitude 0..1
+            _hitClipPlayer.amplitude = Mathf.Clamp01(metaHapticsIntensity);
+
+            // Play on both controllers
+            _hitClipPlayer.Play(Controller.Both);
+
+            return; // don't also send legacy XR haptics
+        }
+
+        // 2) Fallback: legacy XR haptics
         if (!hapticsOnHit) return;
         if (Time.time < _nextHapticTime) return;
         _nextHapticTime = Time.time + hapticRetriggerCooldown;

@@ -40,7 +40,7 @@ public class CrystalCollectible : MonoBehaviour
     public XRBaseController leftController;
     public XRBaseController rightController;
 
-    [Range(0f, 1f)] public float hapticAmplitude = 0.7f;
+    [Range(0f, 10f)] public float hapticAmplitude = 0.7f;
     public float hapticDuration = 0.1f;
 
     private XRGrabInteractable grab;

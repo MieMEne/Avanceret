@@ -8231,6 +8231,13 @@ MonoBehaviour:
   badSound: {fileID: 8300000, guid: 5e876061e6e6c4c6db1774dc7f592acf, type: 3}
   goodVFX: {fileID: 0}
   badVFX: {fileID: 0}
+  useMetaHaptics: 1
+  goodHaptic: {fileID: 0}
+  badHaptic: {fileID: 0}
+  leftController: {fileID: 0}
+  rightController: {fileID: 0}
+  hapticAmplitude: 0.7
+  hapticDuration: 0.1
 --- !u!114 &260899233
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20728,6 +20735,13 @@ MonoBehaviour:
   badSound: {fileID: 0}
   goodVFX: {fileID: 0}
   badVFX: {fileID: 0}
+  useMetaHaptics: 1
+  goodHaptic: {fileID: 2460798210113038985, guid: 12c48e75797c948d59cff2b19c7b01c6, type: 3}
+  badHaptic: {fileID: 0}
+  leftController: {fileID: 0}
+  rightController: {fileID: 0}
+  hapticAmplitude: 10
+  hapticDuration: 1000
 --- !u!114 &638087834
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27602,6 +27616,13 @@ MonoBehaviour:
   badSound: {fileID: 0}
   goodVFX: {fileID: 0}
   badVFX: {fileID: 0}
+  useMetaHaptics: 1
+  goodHaptic: {fileID: 0}
+  badHaptic: {fileID: 0}
+  leftController: {fileID: 0}
+  rightController: {fileID: 0}
+  hapticAmplitude: 0.7
+  hapticDuration: 0.1
 --- !u!114 &908748007
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34353,6 +34374,13 @@ MonoBehaviour:
   badSound: {fileID: 0}
   goodVFX: {fileID: 0}
   badVFX: {fileID: 0}
+  useMetaHaptics: 1
+  goodHaptic: {fileID: 0}
+  badHaptic: {fileID: 0}
+  leftController: {fileID: 0}
+  rightController: {fileID: 0}
+  hapticAmplitude: 0.7
+  hapticDuration: 0.1
 --- !u!114 &1118315832
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -42380,6 +42408,13 @@ MonoBehaviour:
   badSound: {fileID: 0}
   goodVFX: {fileID: 0}
   badVFX: {fileID: 0}
+  useMetaHaptics: 1
+  goodHaptic: {fileID: 0}
+  badHaptic: {fileID: 0}
+  leftController: {fileID: 0}
+  rightController: {fileID: 0}
+  hapticAmplitude: 0.7
+  hapticDuration: 0.1
 --- !u!114 &1392113412
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -46651,6 +46686,13 @@ MonoBehaviour:
   badSound: {fileID: 8300000, guid: 5e876061e6e6c4c6db1774dc7f592acf, type: 3}
   goodVFX: {fileID: 0}
   badVFX: {fileID: 0}
+  useMetaHaptics: 1
+  goodHaptic: {fileID: 0}
+  badHaptic: {fileID: 0}
+  leftController: {fileID: 0}
+  rightController: {fileID: 0}
+  hapticAmplitude: 0.7
+  hapticDuration: 0.1
 --- !u!114 &1515371403
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -61557,6 +61599,13 @@ MonoBehaviour:
   badSound: {fileID: 8300000, guid: 5e876061e6e6c4c6db1774dc7f592acf, type: 3}
   goodVFX: {fileID: 0}
   badVFX: {fileID: 0}
+  useMetaHaptics: 1
+  goodHaptic: {fileID: 0}
+  badHaptic: {fileID: 0}
+  leftController: {fileID: 0}
+  rightController: {fileID: 0}
+  hapticAmplitude: 0.7
+  hapticDuration: 0.1
 --- !u!114 &1793424720
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -62145,6 +62194,13 @@ MonoBehaviour:
   badSound: {fileID: 0}
   goodVFX: {fileID: 0}
   badVFX: {fileID: 0}
+  useMetaHaptics: 1
+  goodHaptic: {fileID: 0}
+  badHaptic: {fileID: 0}
+  leftController: {fileID: 0}
+  rightController: {fileID: 0}
+  hapticAmplitude: 0.7
+  hapticDuration: 0.1
 --- !u!114 &1799842956
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -67870,6 +67926,13 @@ MonoBehaviour:
   badSound: {fileID: 0}
   goodVFX: {fileID: 0}
   badVFX: {fileID: 0}
+  useMetaHaptics: 1
+  goodHaptic: {fileID: 0}
+  badHaptic: {fileID: 0}
+  leftController: {fileID: 0}
+  rightController: {fileID: 0}
+  hapticAmplitude: 0.7
+  hapticDuration: 0.1
 --- !u!114 &2008427338
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -70723,6 +70786,13 @@ MonoBehaviour:
   badSound: {fileID: 8300000, guid: 5e876061e6e6c4c6db1774dc7f592acf, type: 3}
   goodVFX: {fileID: 0}
   badVFX: {fileID: 0}
+  useMetaHaptics: 1
+  goodHaptic: {fileID: 0}
+  badHaptic: {fileID: 0}
+  leftController: {fileID: 0}
+  rightController: {fileID: 0}
+  hapticAmplitude: 0.7
+  hapticDuration: 0.1
 --- !u!114 &2100081245
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -71705,6 +71775,13 @@ MonoBehaviour:
   badSound: {fileID: 8300000, guid: 5e876061e6e6c4c6db1774dc7f592acf, type: 3}
   goodVFX: {fileID: 0}
   badVFX: {fileID: 0}
+  useMetaHaptics: 1
+  goodHaptic: {fileID: 0}
+  badHaptic: {fileID: 0}
+  leftController: {fileID: 0}
+  rightController: {fileID: 0}
+  hapticAmplitude: 0.7
+  hapticDuration: 0.1
 --- !u!114 &2123820044
 MonoBehaviour:
   m_ObjectHideFlags: 0

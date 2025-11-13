@@ -26,6 +26,25 @@ public class HeadTiltLocomotionWithRespawn : MonoBehaviour
     [Tooltip("Optional: set a custom spawn transform. If empty, we use the scene start pose.")]
     public Transform customSpawnPoint;
 
+    [Header("Bounds Respawn (walk off floor)")]
+    [Tooltip("If true, player will respawn when they leave the floor plane bounds or fall below Min Y.")]
+    public bool enableBoundsRespawn = true;
+
+    [Tooltip("The floor plane. Bounds are auto-computed from its MeshRenderer.")]
+    public Transform floorPlane;
+
+    [Tooltip("Extra padding outside the plane bounds before we respawn (in meters).")]
+    public float boundsPadding = 0.5f;
+
+    [Tooltip("Computed X range of the floor (world space).")]
+    public Vector2 xBounds = new Vector2(-50f, 50f);
+
+    [Tooltip("Computed Z range of the floor (world space).")]
+    public Vector2 zBounds = new Vector2(-50f, 50f);
+
+    [Tooltip("If player Y falls below this height, they respawn.")]
+    public float minY = -5f;
+
     [Header("Haptics On Hit (legacy XR)")]
     public bool hapticsOnHit = true;
     [Range(0f, 1f)] public float hapticAmplitude = 0.6f;
@@ -85,6 +104,30 @@ public class HeadTiltLocomotionWithRespawn : MonoBehaviour
         _startPos = customSpawnPoint ? customSpawnPoint.position : transform.position;
         _startRot = customSpawnPoint ? customSpawnPoint.rotation : transform.rotation;
 
+        // Auto-compute floor bounds if we have a plane
+        if (enableBoundsRespawn && floorPlane != null)
+        {
+            var mr = floorPlane.GetComponent<MeshRenderer>();
+            if (mr != null)
+            {
+                Bounds b = mr.bounds;
+                xBounds = new Vector2(b.min.x - boundsPadding, b.max.x + boundsPadding);
+                zBounds = new Vector2(b.min.z - boundsPadding, b.max.z + boundsPadding);
+
+                // Set a reasonable minY just below the floor if current value is far away
+                float suggestedMinY = b.min.y - 2f;
+                if (minY < suggestedMinY - 0.01f || minY > suggestedMinY + 0.01f)
+                    minY = suggestedMinY;
+
+                if (printRollInConsole)
+                    Debug.Log($"[HeadTilt] Floor bounds from '{floorPlane.name}': X {xBounds.x:F1}..{xBounds.y:F1}, Z {zBounds.x:F1}..{zBounds.y:F1}, minY {minY:F1}");
+            }
+            else if (printRollInConsole)
+            {
+                Debug.LogWarning("[HeadTilt] floorPlane has no MeshRenderer, cannot compute bounds.");
+            }
+        }
+
         CalibrateNeutralTilt();
     }
 
@@ -126,6 +169,22 @@ public class HeadTiltLocomotionWithRespawn : MonoBehaviour
         // 4) Apply with CharacterController
         _cc.Move(velocity * Time.deltaTime);
 
+        // 5) Check bounds: if we walked off the floor, respawn
+        if (enableBoundsRespawn)
+        {
+            Vector3 p = transform.position;
+
+            bool outOfX = p.x < xBounds.x || p.x > xBounds.y;
+            bool outOfZ = p.z < zBounds.x || p.z > zBounds.y;
+            bool outOfY = p.y < minY;
+
+            if (outOfX || outOfZ || outOfY)
+            {
+                Respawn();
+                return;
+            }
+        }
+
 #if UNITY_EDITOR
         // Handy editor key: press R to recalibrate neutral
         if (Input.GetKeyDown(KeyCode.R)) CalibrateNeutralTilt();
@@ -136,8 +195,18 @@ public class HeadTiltLocomotionWithRespawn : MonoBehaviour
     {
         if (hit.collider != null && (hit.collider.CompareTag("Obstacle") || hit.collider.CompareTag("MovingObstacle")))
         {
-            TriggerHaptics();          // now uses Meta Haptics if set
-            if (hitAudio) hitAudio.Play();   // play error sound
+            TriggerHaptics();           // use Meta Haptics if set
+
+            if (hitAudio && hitAudio.clip != null)
+            {
+                Debug.Log("[HeadTilt] Playing hit audio: " + hitAudio.clip.name);
+                hitAudio.PlayOneShot(hitAudio.clip);
+            }
+            else
+            {
+                Debug.LogWarning("[HeadTilt] No hitAudio or no clip assigned.");
+            }
+
             Respawn();
         }
     }
@@ -164,10 +233,9 @@ public class HeadTiltLocomotionWithRespawn : MonoBehaviour
 
     void TriggerHaptics()
     {
-        // 1) Try Meta Haptics (.haptic) first
+        // 1) Meta Haptics (.haptic)
         if (useMetaHaptics && obstacleHitClip != null)
         {
-            // Always recreate the player to avoid clip getter issues
             if (_hitClipPlayer != null)
             {
                 _hitClipPlayer.Dispose();
@@ -175,24 +243,18 @@ public class HeadTiltLocomotionWithRespawn : MonoBehaviour
             }
 
             _hitClipPlayer = new HapticClipPlayer(obstacleHitClip);
-
-            // Intensity: amplitude 0..1
             _hitClipPlayer.amplitude = Mathf.Clamp01(metaHapticsIntensity);
-
-            // Play on both controllers
             _hitClipPlayer.Play(Controller.Both);
-
-            return; // don't also send legacy XR haptics
+            return; // skip legacy haptics
         }
 
-        // 2) Fallback: legacy XR haptics
+        // 2) Legacy XR haptics
         if (!hapticsOnHit) return;
         if (Time.time < _nextHapticTime) return;
         _nextHapticTime = Time.time + hapticRetriggerCooldown;
 
         bool usedXRI = false;
 
-        // Preferred: XR Interaction Toolkit controllers
         if (leftController)
         {
             leftController.SendHapticImpulse(Mathf.Clamp01(hapticAmplitude), Mathf.Max(0f, hapticDuration));
@@ -204,7 +266,6 @@ public class HeadTiltLocomotionWithRespawn : MonoBehaviour
             usedXRI = true;
         }
 
-        // Fallback to low-level XR API if XRI controllers not assigned
         if (!usedXRI)
         {
             TryLowLevelHaptic(XRNode.LeftHand, hapticAmplitude, hapticDuration);
@@ -226,7 +287,6 @@ public class HeadTiltLocomotionWithRespawn : MonoBehaviour
     // ---------------- HELPERS ----------------
 
     // Robust roll: signed angle between world up and head up around the head's forward axis.
-    // Right ear up -> positive; left ear up -> negative.
     static float GetGravityRelativeRollDegrees(Transform h)
     {
         float roll = Vector3.SignedAngle(Vector3.up, h.up, h.forward);

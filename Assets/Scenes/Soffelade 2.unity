@@ -8106,7 +8106,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 260899228}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b6671dc4bf1d941a783371cb848a1fa4, type: 3}
   m_Name: 
@@ -14381,7 +14381,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 421536602}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 1, w: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -14389,7 +14389,7 @@ Transform:
   - {fileID: 489135714}
   - {fileID: 1034697878}
   m_Father: {fileID: 945119882}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &421536604
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20736,12 +20736,12 @@ MonoBehaviour:
   goodVFX: {fileID: 0}
   badVFX: {fileID: 0}
   useMetaHaptics: 1
-  goodHaptic: {fileID: 2460798210113038985, guid: 12c48e75797c948d59cff2b19c7b01c6, type: 3}
+  goodHaptic: {fileID: 2460798210113038985, guid: 6d2c2c030be994ead9782c9256e64bb0, type: 3}
   badHaptic: {fileID: 0}
   leftController: {fileID: 0}
   rightController: {fileID: 0}
   hapticAmplitude: 1
-  hapticDuration: 1000
+  hapticDuration: 10
 --- !u!114 &638087834
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27491,7 +27491,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 908748002}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b6671dc4bf1d941a783371cb848a1fa4, type: 3}
   m_Name: 
@@ -34249,7 +34249,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1118315827}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b6671dc4bf1d941a783371cb848a1fa4, type: 3}
   m_Name: 
@@ -34375,7 +34375,7 @@ MonoBehaviour:
   goodVFX: {fileID: 0}
   badVFX: {fileID: 0}
   useMetaHaptics: 1
-  goodHaptic: {fileID: 2460798210113038985, guid: 12c48e75797c948d59cff2b19c7b01c6, type: 3}
+  goodHaptic: {fileID: 2460798210113038985, guid: 6d2c2c030be994ead9782c9256e64bb0, type: 3}
   badHaptic: {fileID: 0}
   leftController: {fileID: 0}
   rightController: {fileID: 0}
@@ -36058,7 +36058,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1169483757}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 1, w: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -36066,7 +36066,7 @@ Transform:
   - {fileID: 2098918167}
   - {fileID: 1710421858}
   m_Father: {fileID: 945119882}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1169483759
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -42283,7 +42283,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1392113407}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b6671dc4bf1d941a783371cb848a1fa4, type: 3}
   m_Name: 
@@ -46561,7 +46561,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1515371398}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b6671dc4bf1d941a783371cb848a1fa4, type: 3}
   m_Name: 
@@ -61474,7 +61474,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1793424715}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b6671dc4bf1d941a783371cb848a1fa4, type: 3}
   m_Name: 
@@ -61604,7 +61604,7 @@ MonoBehaviour:
   badHaptic: {fileID: 0}
   leftController: {fileID: 0}
   rightController: {fileID: 0}
-  hapticAmplitude: 1
+  hapticAmplitude: 0.7
   hapticDuration: 0.1
 --- !u!114 &1793424720
 MonoBehaviour:
@@ -62069,7 +62069,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1799842951}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b6671dc4bf1d941a783371cb848a1fa4, type: 3}
   m_Name: 
@@ -67801,7 +67801,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2008427333}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b6671dc4bf1d941a783371cb848a1fa4, type: 3}
   m_Name: 
@@ -70661,7 +70661,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2100081240}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b6671dc4bf1d941a783371cb848a1fa4, type: 3}
   m_Name: 
@@ -70788,7 +70788,7 @@ MonoBehaviour:
   badVFX: {fileID: 0}
   useMetaHaptics: 1
   goodHaptic: {fileID: 0}
-  badHaptic: {fileID: 2460798210113038985, guid: 2243bcb5d38534588b0a37771e61e6b1, type: 3}
+  badHaptic: {fileID: 2460798210113038985, guid: 0aa182bfb53eb4125bf30c7a60664522, type: 3}
   leftController: {fileID: 0}
   rightController: {fileID: 0}
   hapticAmplitude: 0.7
@@ -71650,7 +71650,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2123820039}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b6671dc4bf1d941a783371cb848a1fa4, type: 3}
   m_Name: 

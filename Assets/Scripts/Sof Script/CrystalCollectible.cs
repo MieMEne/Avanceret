@@ -40,7 +40,7 @@ public class CrystalCollectible : MonoBehaviour
     public XRBaseController leftController;
     public XRBaseController rightController;
 
-    [Range(0f, 10f)] public float hapticAmplitude = 0.7f;
+    [Range(0f, 1f)] public float hapticAmplitude = 0.5f;
     public float hapticDuration = 0.1f;
 
     private XRGrabInteractable grab;
@@ -111,7 +111,7 @@ public class CrystalCollectible : MonoBehaviour
             if (goodVFX) Instantiate(goodVFX, transform.position, Quaternion.identity);
         }
 
-        Destroy(gameObject, 0.1f); // small delay to let haptic play
+        Destroy(gameObject, 3f); // small delay to let haptic play
     }
 
     // ---------------- HAPTICS ----------------
